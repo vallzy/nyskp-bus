@@ -1,5 +1,4 @@
 function BFS(node) {
-    let counter = 0;
     let tr = [];
     let dirQueue = [node];
     node.name = 'root';
@@ -14,22 +13,20 @@ function BFS(node) {
       nodeIndex.visited = true;
       tr.push({
         title: nodeIndex.name,
-        key: 'dir-' + nodeIndex.name,
-        children: PopulateRoot(nodeIndex, counter)
+        key: nodeIndex.name,
+        children: PopulateRoot(nodeIndex)
       });
-  
-      counter += 1;
     }
     return tr;
   }
   
-  function PopulateRoot(dir, num) {
+  function PopulateRoot(dir) {
     let content = [];
     let counter = 0;
     for (const key of Object.keys(dir)) {
       const item = dir[key];
       if(item instanceof File) {
-          content.push({ title: key, key: num + '-' + counter, isLeaf:true });
+          content.push({ title: key, key: dir.name + '-' + counter, isLeaf:true });
           counter += 1;
       }
     }

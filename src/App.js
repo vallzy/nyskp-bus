@@ -1,12 +1,10 @@
 import React from 'react';
 import 'antd/dist/antd.min.css'
 import './index.css';
-import { Breadcrumb, Card, Layout, Menu, Typography, Col, Row} from 'antd';
+import { Layout, Menu } from 'antd';
 import GetAccess from './components/GetAccess';
 
-const { Title } = Typography;
-
-const { Header, Content, Footer } = Layout;
+const { Header, Content } = Layout;
 
 
 const items = [
