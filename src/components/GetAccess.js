@@ -1,77 +1,16 @@
-import { Button, Card, Switch, Tree, Typography, Divider } from 'antd';
-import React, { useState, useEffect } from 'react';
+import { Button, Card, Tree, Typography, Divider } from 'antd';
+import React, { useState } from 'react';
+import { BFS } from '../lib/DirRootTree'; 
+import { GetDirectoryAccess } from '../lib/Access';
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
 
-var treeData = [];
-
-async function handleDirectoryEntry( dirHandle, out ) {
-  for await (const entry of dirHandle.values()) {
-      if (entry.kind === "file"){
-      const file = await entry.getFile();
-      out[ file.name ] = file;
-      }
-      if (entry.kind === "directory") {
-      const newOut = out[ entry.name ] = { visited: false, name: entry.name };
-      await handleDirectoryEntry( entry, newOut );
-      }
-  }
-}
-
-function BFS(node) {
-  let counter = 0;
-  let tr = [];
-  let dirQueue = [node];
-  node.name = 'root';
-  while(dirQueue.length > 0) {
-    var nodeIndex = dirQueue.shift();
-    for (const key of Object.keys(nodeIndex)) {
-      const item = nodeIndex[key];
-      if(item.visited !== undefined && !item.visited) { 
-        dirQueue.push(item);
-      }
-    }
-    nodeIndex.visited = true;
-    tr.push({
-      title: nodeIndex.name,
-      key: 'dir-' + nodeIndex.name,
-      children: PopulateRoot(nodeIndex, counter)
-    });
-
-    counter += 1;
-  }
-  treeData = tr;
-  return treeData;
-}
-
-
-async function GetDirectoryAccess() {
-    const out = {};
-    let dirHandle = await window.showDirectoryPicker();
-    await handleDirectoryEntry( dirHandle, out );
-    let tree = BFS(out);
-    return tree;
-}
-
-function PopulateRoot(dir, num) {
-  let content = [];
-  let counter = 0;
-  for (const key of Object.keys(dir)) {
-    const item = dir[key];
-    if(item instanceof File) {
-        content.push({ title: key, key: num + '-' + counter, isLeaf:true });
-        counter += 1;
-    }
-  }
-  return content;
-}
-
-
 function GetAccess() {
-  const [data, setData] = useState(treeData);
+  const [data, setData] = useState([]);
   const startAccess = async () => {
-    let y = await GetDirectoryAccess();
-    setData(y);
+    let rawTree = await GetDirectoryAccess();
+    let tree = BFS(rawTree);
+    setData(tree);
   };
   return(
     <>
