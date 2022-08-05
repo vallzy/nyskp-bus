@@ -1,12 +1,13 @@
 async function GetDirectoryAccess() {
     const out = {};
     let dirHandle = await window.showDirectoryPicker();
-    await handleDirectoryEntry( dirHandle, out );
+    await HandleDirectoryEntry( dirHandle, out );
     return out;
 }
 
 
-async function handleDirectoryEntry( dirHandle, out ) {
+
+async function HandleDirectoryEntry( dirHandle, out ) {
     for await (const entry of dirHandle.values()) {
         if (entry.kind === "file"){
         const file = await entry.getFile();
@@ -14,9 +15,9 @@ async function handleDirectoryEntry( dirHandle, out ) {
         }
         if (entry.kind === "directory") {
         const newOut = out[ entry.name ] = { visited: false, name: entry.name };
-        await handleDirectoryEntry( entry, newOut );
+        await HandleDirectoryEntry( entry, newOut );
         }
     }
   }
 
-  export { GetDirectoryAccess };
+  export { GetDirectoryAccess, HandleDirectoryEntry };

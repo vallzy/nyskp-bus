@@ -9,7 +9,7 @@ const { Header, Content } = Layout;
 
 const items = [
   { label: 'Home', key: 'home' },
-  { label: 'About', key: 'about'}
+  { label: 'About', key: 'about' }
 ];
 
 const App = () => (
@@ -24,16 +24,16 @@ const App = () => (
       </Menu>
     </Header>
     <Content>
-    <Space
-    direction="vertical"
-    size="middle"
-    style={{
-      display: 'flex',
-      backgroundColor: 'white'
-    }}
-    >
-    <GetAccess/>
-    </Space>
+      <Space
+        direction="vertical"
+        size="middle"
+        style={{
+          display: 'flex',
+          backgroundColor: 'white'
+        }}
+      >
+        <GetAccess />
+      </Space>
     </Content>
   </Layout>
 );
