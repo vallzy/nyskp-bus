@@ -1,6 +1,7 @@
 async function GetDirectoryAccess() {
     const out = {};
     let dirHandle = await window.showDirectoryPicker();
+    out.name = dirHandle.name;
     await HandleDirectoryEntry( dirHandle, out );
     return out;
 }

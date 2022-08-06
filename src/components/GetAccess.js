@@ -9,6 +9,7 @@ import "../tester.css"
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
 
+let masterTree = [];
 
 async function tester() {
   let fileHandle;
@@ -34,9 +35,9 @@ function GetAccess() {
   
   const startAccess = async () => {
     let rawTree = await GetDirectoryAccess();
-    console.log(rawTree);
     let tree = BFS(rawTree);
-    setData(tree);
+    masterTree = [...masterTree, ...tree];
+    setData(masterTree);
   };
 
   let props = {
@@ -48,10 +49,10 @@ function GetAccess() {
   
       for await (const handle of fileHandlesPromises) {
         if (handle.kind === 'directory') {
-          console.log('Directory', handle);
-          const out = {};
+          const out = {name: handle.name};
           await HandleDirectoryEntry( handle, out );
           let droptree = BFS(out);
+          console.log(droptree);
           setData(droptree);
         } else {
           console.log(`File: ${handle.name}`);

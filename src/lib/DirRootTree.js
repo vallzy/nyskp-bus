@@ -1,14 +1,12 @@
 function BFS(node) {
     let tr = [];
     let dirQueue = [node];
-    node.name = 'root';
     while(dirQueue.length > 0) {
       var nodeIndex = dirQueue.shift();
       for (const key of Object.keys(nodeIndex)) {
         const item = nodeIndex[key];
-        if(item.visited !== undefined && !item.visited) { 
+        if(item.visited !== undefined && !item.visited)
           dirQueue.push(item);
-        }
       }
       nodeIndex.visited = true;
       tr.push({
