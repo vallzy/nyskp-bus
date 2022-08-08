@@ -1,7 +1,6 @@
 import { Button, Card, Tree, Typography, Divider, Space } from 'antd';
 import React, { useState } from 'react';
-import { BFS } from '../lib/DirRootTree';
-import { GetDirectoryAccess, HandleDirectoryEntry } from '../lib/Access';
+import { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList } from '../lib/Access';
 import Dragdrop from './Dragdrop';
 import { writeFile } from '../lib/fs-helper';
 import "../tester.css"
@@ -36,7 +35,7 @@ function GetAccess() {
   
   const startAccess = async () => {
     let rawTree = await GetDirectoryAccess();
-    masterTree = [...masterTree, ...await BFS(rawTree)];
+    masterTree = [...masterTree, rawTree];
     setData(masterTree);
   };
 
@@ -50,8 +49,11 @@ function GetAccess() {
       for await (const handle of fileHandlesPromises) {
         if (handle.kind === 'directory') {
           const out = {name: handle.name}; 
-          await HandleDirectoryEntry( handle, out, handle );
-          masterTree = [...masterTree, ...await BFS(out)];
+          let pathList = {};
+          let bkupHandle = handle;
+          await HandleDirectoryEntry( handle, out, bkupHandle, pathList);
+          let rawTree = await GenerateDirectoryList(pathList, bkupHandle);
+          masterTree = [...masterTree, rawTree];
           setData(masterTree);
         } else {
           console.log(`File: ${handle.name}`);

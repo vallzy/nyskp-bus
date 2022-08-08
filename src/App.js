@@ -3,9 +3,9 @@ import 'antd/dist/antd.min.css'
 import './index.css';
 import { Layout, Menu, Space } from 'antd';
 import GetAccess from './components/GetAccess';
+import { clear } from 'idb-keyval';
 
 const { Header, Content } = Layout;
-
 
 const items = [
   { label: 'Home', key: 'home' },

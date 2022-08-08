@@ -3,33 +3,50 @@ import { set } from 'idb-keyval';
 async function GetDirectoryAccess() {
     const out = {};
     let dirHandle = await window.showDirectoryPicker();
+    let dirHandleBackup = dirHandle;
     out.name = dirHandle.name;
     let pathList = {};
-    await HandleDirectoryEntry(dirHandle, out, dirHandle, pathList);
+    await HandleDirectoryEntry(dirHandle, out, dirHandleBackup, pathList);
     //console.log('pathList', pathList);
-    GenerateDirectoryList(pathList);
-    return out;
+    let t = await GenerateDirectoryList(pathList, dirHandleBackup);
+    return t;
 }
 
-function parentPath(full) {
+function ParentPath(full, dirHandleRoot) {
     let sp = full.split('/');
+    if(sp.length === 1) return dirHandleRoot.name;
     return sp.slice(0, sp.length - 1).join("/");
 }
 
-async function GenerateDirectoryList(files) {
-    let children = [];
-    let level = {  };
-
-    Object.keys(files).forEach((path) => {
-      path.split("/").reduce((r, name) => {
-        if (!name) {
-          return;
+function MergeDirectories(output, dirHandleRoot) {
+    Object.keys(output).forEach((key) => {
+        if(key !== dirHandleRoot.name) {
+            let parent = ParentPath(key, dirHandleRoot);
+            output[parent].children.push(output[key]);
         }
-        
-        return r[name];
-      }, level);
     });
-    console.log(level);
+    return output[dirHandleRoot.name];
+}
+
+async function GenerateDirectoryList(files, dirHandleRoot) {
+    let dir = {};
+    dir[dirHandleRoot.name] = { title: dirHandleRoot.name, key: dirHandleRoot.name, children: []};
+    Object.keys(files).forEach((key) => {
+        let item = files[key];
+        if(item.type === "directory") {
+            dir[key] = { title: item.name, key: item.path, children: [] }
+        }
+    });
+    Object.keys(files).forEach((key) => {
+        let item = files[key];
+        if(item.type === "file") {
+            let parent = ParentPath(item.path, dirHandleRoot);
+            let entry = { title: item.name, key: item.path, isLeaf: true }
+            dir[parent] ? dir[parent].children.push(entry) : dir[dirHandleRoot.name].children.push(entry);
+        }
+    });
+    let tree = MergeDirectories(dir, dirHandleRoot);
+    return tree;
 }
 
 /*
@@ -64,4 +81,4 @@ async function HandleDirectoryEntry(dirHandle, out, rootCopy, pathList) {
     }
 }
 
-export { GetDirectoryAccess, HandleDirectoryEntry };
+export { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList };
