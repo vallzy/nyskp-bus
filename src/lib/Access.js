@@ -11,8 +11,8 @@ async function GetDirectoryAccess() {
 async function HandleDirectoryEntry( dirHandle, out ) {
     for await (const entry of dirHandle.values()) {
         if (entry.kind === "file"){
-        const file = await entry.getFile();
-        out[ file.name ] = file;
+        //const file = await entry.getFile(); 
+        out[ entry.name ] = entry;
         }
         if (entry.kind === "directory") {
         const newOut = out[ entry.name ] = { visited: false, name: entry.name };

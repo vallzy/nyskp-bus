@@ -1,4 +1,6 @@
-function BFS(node) {
+import { set } from 'idb-keyval';
+
+async function BFS(node) {
     let tr = [];
     let dirQueue = [node];
     while(dirQueue.length > 0) {
@@ -12,21 +14,24 @@ function BFS(node) {
       tr.push({
         title: nodeIndex.name,
         key: nodeIndex.name,
-        children: PopulateRoot(nodeIndex)
+        children: await PopulateRoot(nodeIndex)
       });
     }
     return tr;
   }
   
-  function PopulateRoot(dir) {
+async function PopulateRoot(dir) {
     let content = [];
-    let counter = 0;
     for (const key of Object.keys(dir)) {
       const item = dir[key];
-      if(item instanceof File) {
-          content.push({ title: key, key: dir.name + '-' + counter, isLeaf:true });
-          counter += 1;
+      console.log(item);
+      /* eslint-disable */
+      if(item instanceof FileSystemFileHandle) {
+        let tkey = dir.name + '-' + item.name;
+        content.push({ title: key, key: tkey, isLeaf:true });
+        await set(tkey, item);
       }
+
     }
     return content;
   }

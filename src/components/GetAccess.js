@@ -5,6 +5,7 @@ import { GetDirectoryAccess, HandleDirectoryEntry } from '../lib/Access';
 import Dragdrop from './Dragdrop';
 import { writeFile } from '../lib/fs-helper';
 import "../tester.css"
+import { get, set } from 'https://unpkg.com/idb-keyval@5.0.2/dist/esm/index.js';
 
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
@@ -30,13 +31,18 @@ async function tester() {
   await window.callMain(["text", "-p"]);
 }
 
+async function tryGetKey() {
+  let y = await get('sandbox-dasdas.txt');
+  console.log('fetched item', y);
+}
+
 function GetAccess() {
   const [data, setData] = useState([]);
   
   const startAccess = async () => {
     let rawTree = await GetDirectoryAccess();
-    let tree = BFS(rawTree);
-    masterTree = [...masterTree, ...tree];
+    console.log('rawtree', rawTree);
+    masterTree = [...masterTree, ...await BFS(rawTree)];
     setData(masterTree);
   };
 
@@ -60,8 +66,15 @@ function GetAccess() {
       }
     }
   }
-
   props.onClick = startAccess;
+
+  const onSelect = (keys, info) => {
+    console.log('Trigger Select', keys, info);
+  };
+
+  const onExpand = (keys, info) => {
+    console.log('Trigger Expand', keys, info);
+  };
   return (
     <>
       <Space direction="horizontal" style={{ width: '100%', justifyContent: 'center' }}>
@@ -70,7 +83,7 @@ function GetAccess() {
           bordered={false}
           className="custom-card"
         >
-          <Button type="primary" style={{ margin: 5 }} onClick={startAccess}>Access Directory</Button>
+          <Button type="primary" style={{ margin: 5 }} onClick={tryGetKey}>Access Directory</Button>
           <Button type="primary" style={{ margin: 5 }} onClick={tester}>Access File</Button>
           <Dragdrop {...props}></Dragdrop>
           <Divider />
@@ -81,6 +94,8 @@ function GetAccess() {
           }
           <DirectoryTree
             multiple
+            onExpand={onExpand}
+            onSelect={onSelect}
             treeData={data}
           />
         </Card>
