@@ -1,4 +1,4 @@
-async function BFS2(node) {
+async function BFS2(root) {
   
 }
 

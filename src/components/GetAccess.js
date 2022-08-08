@@ -5,11 +5,10 @@ import { GetDirectoryAccess, HandleDirectoryEntry } from '../lib/Access';
 import Dragdrop from './Dragdrop';
 import { writeFile } from '../lib/fs-helper';
 import "../tester.css"
-import { get } from 'idb-keyval';
+import { get, clear } from 'idb-keyval';
 
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
-
 
 let masterTree = [];
 
@@ -51,7 +50,7 @@ function GetAccess() {
       for await (const handle of fileHandlesPromises) {
         if (handle.kind === 'directory') {
           const out = {name: handle.name}; 
-          await HandleDirectoryEntry( handle, out );
+          await HandleDirectoryEntry( handle, out, handle );
           masterTree = [...masterTree, ...await BFS(out)];
           setData(masterTree);
         } else {
@@ -63,15 +62,16 @@ function GetAccess() {
   props.onClick = startAccess;
 
   const onSelect = async (keys, info) => {
-    console.log('Trigger Select', keys, info);
+    //console.log('Trigger Select', keys, info);
+    console.log(keys);
     let filehandle = await get(keys[0]);
     console.log('Filehandle acquired', filehandle);
   };
 
   const onExpand = async (keys, info) => {
     //console.log('Trigger Expand', keys, info);
-    let dirhandle = await get(keys[0]);
-    console.log('Dirhandle acquired', dirhandle);
+    //let dirhandle = await get(keys[0]);
+    //console.log('Dirhandle acquired', dirhandle);
   };
   return (
     <>
