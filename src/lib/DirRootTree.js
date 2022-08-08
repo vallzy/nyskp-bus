@@ -24,7 +24,6 @@ async function PopulateRoot(dir) {
     let content = [];
     for (const key of Object.keys(dir)) {
       const item = dir[key];
-      console.log(item);
       /* eslint-disable */
       if(item instanceof FileSystemFileHandle) {
         let tkey = dir.name + '-' + item.name;

@@ -5,7 +5,7 @@ import { GetDirectoryAccess, HandleDirectoryEntry } from '../lib/Access';
 import Dragdrop from './Dragdrop';
 import { writeFile } from '../lib/fs-helper';
 import "../tester.css"
-import { get, set } from 'https://unpkg.com/idb-keyval@5.0.2/dist/esm/index.js';
+import { set, get } from 'idb-keyval';
 
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
@@ -41,7 +41,6 @@ function GetAccess() {
   
   const startAccess = async () => {
     let rawTree = await GetDirectoryAccess();
-    console.log('rawtree', rawTree);
     masterTree = [...masterTree, ...await BFS(rawTree)];
     setData(masterTree);
   };
@@ -50,16 +49,18 @@ function GetAccess() {
     async onDrop(e) {
       e.preventDefault();
       const fileHandlesPromises = [...e.dataTransfer.items]
-        .filter((item) => item.kind === 'file')
+        .filter((item) => item.kind === 'file' || item.kind === 'directory')
         .map((item) => item.getAsFileSystemHandle());
-  
+
       for await (const handle of fileHandlesPromises) {
         if (handle.kind === 'directory') {
-          const out = {name: handle.name};
+          console.log('dir', handle);
+          const out = {name: handle.name}; 
+          await set(handle.name, handle);
           await HandleDirectoryEntry( handle, out );
-          let droptree = BFS(out);
-          console.log(droptree);
-          setData(droptree);
+          console.log('out', out);
+          masterTree = [...masterTree, ...await BFS(out)];
+          setData(masterTree);
         } else {
           console.log(`File: ${handle.name}`);
         }
@@ -68,12 +69,16 @@ function GetAccess() {
   }
   props.onClick = startAccess;
 
-  const onSelect = (keys, info) => {
-    console.log('Trigger Select', keys, info);
+  const onSelect = async (keys, info) => {
+    //console.log('Trigger Select', keys, info);
+    let filehandle = await get(keys[0]);
+    console.log('Filehandle acquired', filehandle);
   };
 
-  const onExpand = (keys, info) => {
-    console.log('Trigger Expand', keys, info);
+  const onExpand = async (keys, info) => {
+    //console.log('Trigger Expand', keys, info);
+    let dirhandle = await get(keys[0]);
+    console.log('Dirhandle acquired', dirhandle);
   };
   return (
     <>

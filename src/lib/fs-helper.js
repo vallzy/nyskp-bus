@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
- 'use strict';
-
  /* exported getFileHandle, getNewFileHandle, readFile, verifyPermission,
              writeFile */
  
@@ -147,4 +145,4 @@
    return false;
  }
 
- export { getNewFileHandle, writeFile, getFileHandle, readFile};
+ export { getNewFileHandle, writeFile, getFileHandle, readFile, verifyPermission};
