@@ -5,10 +5,11 @@ import { GetDirectoryAccess, HandleDirectoryEntry } from '../lib/Access';
 import Dragdrop from './Dragdrop';
 import { writeFile } from '../lib/fs-helper';
 import "../tester.css"
-import { set, get } from 'idb-keyval';
+import { get } from 'idb-keyval';
 
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
+
 
 let masterTree = [];
 
@@ -31,11 +32,6 @@ async function tester() {
   await window.callMain(["text", "-p"]);
 }
 
-async function tryGetKey() {
-  let y = await get('sandbox-dasdas.txt');
-  console.log('fetched item', y);
-}
-
 function GetAccess() {
   const [data, setData] = useState([]);
   
@@ -54,11 +50,8 @@ function GetAccess() {
 
       for await (const handle of fileHandlesPromises) {
         if (handle.kind === 'directory') {
-          console.log('dir', handle);
           const out = {name: handle.name}; 
-          await set(handle.name, handle);
           await HandleDirectoryEntry( handle, out );
-          console.log('out', out);
           masterTree = [...masterTree, ...await BFS(out)];
           setData(masterTree);
         } else {
@@ -70,7 +63,7 @@ function GetAccess() {
   props.onClick = startAccess;
 
   const onSelect = async (keys, info) => {
-    //console.log('Trigger Select', keys, info);
+    console.log('Trigger Select', keys, info);
     let filehandle = await get(keys[0]);
     console.log('Filehandle acquired', filehandle);
   };
@@ -88,7 +81,7 @@ function GetAccess() {
           bordered={false}
           className="custom-card"
         >
-          <Button type="primary" style={{ margin: 5 }} onClick={tryGetKey}>Access Directory</Button>
+          <Button type="primary" style={{ margin: 5 }} onClick={tester}>Access Directory</Button>
           <Button type="primary" style={{ margin: 5 }} onClick={tester}>Access File</Button>
           <Dragdrop {...props}></Dragdrop>
           <Divider />

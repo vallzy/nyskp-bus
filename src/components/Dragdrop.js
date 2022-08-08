@@ -3,7 +3,6 @@ import { InboxOutlined } from '@ant-design/icons';
 import React from 'react';
 
 function Dragdrop(props) {
-  console.log(props);
   const handleOnDragEnter = ev => {
     ev.stopPropagation();
     ev.preventDefault();
