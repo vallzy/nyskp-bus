@@ -1,0 +1,13 @@
+{
+	"n_targets": 125232308,
+	"n_bootstraps": 0,
+	"n_processed": 10000,
+	"n_pseudoaligned": 9255,
+	"n_unique": 6789,
+	"p_pseudoaligned": 92.5,
+	"p_unique": 67.9,
+	"kallisto_version": "0.46.1",
+	"index_version": 8,
+	"start_time": "Tue Dec 10 10:41:05 2019",
+	"call": "../build/src/kallisto bus -i transcripts.kidx -x 10xv2 -o bus_out -t 4 sc_reads_1.fastq.gz sc_reads_2.fastq.gz"
+}
