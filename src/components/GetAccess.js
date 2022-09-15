@@ -2,9 +2,9 @@ import { Button, Card, Tree, Typography, Divider, Space } from 'antd';
 import React, { useState } from 'react';
 import { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList } from '../lib/Access';
 import Dragdrop from './Dragdrop';
-import { writeFile } from '../lib/fs-helper';
 import "../tester.css"
-import { get, clear } from 'idb-keyval';
+import { get } from 'idb-keyval';
+import { text } from '../lib/BustoolsHandler';
 
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
@@ -12,22 +12,19 @@ const { Title } = Typography;
 let masterTree = [];
 
 async function tester() {
-  let fileHandle;
-  [fileHandle] = await window.showOpenFilePicker();
-  let file = await fileHandle.getFile();
-  console.log('handle', fileHandle);
-  console.log('file', file);
-  const root = await navigator.storage.getDirectory();
-  const sandbox = await root.getDirectoryHandle('sandbox', {
-    create: true,
-  });
-  let result = await sandbox.getFileHandle("output.txt", { create: true });
-  //let content = await readFile(await fileHandle.getFile());
-  await writeFile(result, "Hello");
-  console.log(await (await result.getFile()).text());
-  let path = await root.resolve(result);
-  console.log(path);
-  await window.callMain(["text", "-p"]);
+  /*
+  let CLI = await getCLI();
+  let y = await entries();
+  for(let i = 0; i < y.length; i++) {
+    if(y[i][1].kind === 'file') {
+      someFiles.push(await y[i][1].getFile());
+    }
+  }
+  const paths = await CLI.mount(someFiles);
+  console.log('paths', paths);
+  const output = await CLI.exec(`bustools text -p ${paths[2]}`);
+  console.log(output);
+  */
 }
 
 function GetAccess() {
@@ -68,6 +65,10 @@ function GetAccess() {
     console.log(keys);
     let filehandle = await get(keys[0]);
     console.log('Filehandle acquired', filehandle);
+    if(filehandle.kind === "file") {
+      let file = await filehandle.getFile();
+      await text(file);
+      }
   };
 
   const onExpand = async (keys, info) => {

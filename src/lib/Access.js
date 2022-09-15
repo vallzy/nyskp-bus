@@ -49,13 +49,7 @@ async function GenerateDirectoryList(files, dirHandleRoot) {
     return tree;
 }
 
-/*
-    dirHandle: The starting point of the directory.
-    out: The output tree
-    rootCopy: A copy of the starting point, used to resolve relative path.
-*/
 async function HandleDirectoryEntry(dirHandle, out, rootCopy, pathList) {
-    //console.log('Location', dirHandle.name);
     await set(dirHandle.name, dirHandle);
     for await (const entry of dirHandle.values()) {
         let fkey = [rootCopy.name, ...await rootCopy.resolve(entry)];
@@ -67,7 +61,6 @@ async function HandleDirectoryEntry(dirHandle, out, rootCopy, pathList) {
             path: path
         };
         pathList[path] = pathObject;
-        //console.log('Evaluating', entry);
         if (entry.kind === "file") {
             out[entry.name] = entry;
             await set(path, entry);
