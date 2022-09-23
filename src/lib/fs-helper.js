@@ -30,6 +30,29 @@
    // For Chrome 85 and earlier...
    return window.chooseFileSystemEntries();
  }
+
+
+ async function getNewBusFileHandle() {
+    if ('showSaveFilePicker' in window) {
+      const opts = {
+        types: [{
+          description: 'BUS file',
+          accept: {'application/octet-stream': ['.bus']},
+        }],
+      };
+      return await window.showSaveFilePicker(opts);
+    }
+    // For Chrome 85 and earlier...
+    const opts = {
+      type: 'save-file',
+      accepts: [{
+        description: 'BUS file',
+        extensions: ['bus'],
+        mimeTypes: ['application/octet-stream'],
+      }],
+    };
+    return await window.chooseFileSystemEntries(opts);
+ }
  
  /**
   * Create a handle to a new (text) file on the local file system.
@@ -145,4 +168,4 @@
    return false;
  }
 
- export { getNewFileHandle, writeFile, getFileHandle, readFile, verifyPermission};
+ export { getNewFileHandle, getNewBusFileHandle, writeFile, getFileHandle, readFile, verifyPermission};

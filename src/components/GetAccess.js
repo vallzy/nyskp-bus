@@ -4,28 +4,13 @@ import { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList } from 
 import Dragdrop from './Dragdrop';
 import "../tester.css"
 import { get } from 'idb-keyval';
-import { text } from '../lib/BustoolsHandler';
+import { text, bus_sort } from '../lib/BustoolsHandler';
+import { getNewBusFileHandle } from '../lib/fs-helper';
 
 const { DirectoryTree } = Tree;
 const { Title } = Typography;
 
 let masterTree = [];
-
-async function tester() {
-  /*
-  let CLI = await getCLI();
-  let y = await entries();
-  for(let i = 0; i < y.length; i++) {
-    if(y[i][1].kind === 'file') {
-      someFiles.push(await y[i][1].getFile());
-    }
-  }
-  const paths = await CLI.mount(someFiles);
-  console.log('paths', paths);
-  const output = await CLI.exec(`bustools text -p ${paths[2]}`);
-  console.log(output);
-  */
-}
 
 function GetAccess() {
   const [data, setData] = useState([]);
@@ -52,8 +37,6 @@ function GetAccess() {
           let rawTree = await GenerateDirectoryList(pathList, bkupHandle);
           masterTree = [...masterTree, rawTree];
           setData(masterTree);
-        } else {
-          console.log(`File: ${handle.name}`);
         }
       }
     }
@@ -67,7 +50,7 @@ function GetAccess() {
     console.log('Filehandle acquired', filehandle);
     if(filehandle.kind === "file") {
       let file = await filehandle.getFile();
-      await text(file);
+      await bus_sort(file);
       }
   };
 
@@ -84,8 +67,6 @@ function GetAccess() {
           bordered={false}
           className="custom-card"
         >
-          <Button type="primary" style={{ margin: 5 }} onClick={tester}>Access Directory</Button>
-          <Button type="primary" style={{ margin: 5 }} onClick={tester}>Access File</Button>
           <Dragdrop {...props}></Dragdrop>
           <Divider />
           {data.length <= 0 &&
@@ -98,6 +79,9 @@ function GetAccess() {
             onExpand={onExpand}
             onSelect={onSelect}
             treeData={data}
+            selectable={true}
+            height={300}
+            style={{marginBottom:'1rem'}}
           />
         </Card>
       </Space>
