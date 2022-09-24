@@ -1,4 +1,4 @@
-import { set } from 'idb-keyval';
+import { set, values } from 'idb-keyval';
 
 async function GetDirectoryAccess() {
     const out = {};
@@ -74,4 +74,20 @@ async function HandleDirectoryEntry(dirHandle, out, rootCopy, pathList) {
     }
 }
 
-export { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList };
+async function CountFileType() {
+    let extList = {};
+    await values().then(async (values) => {
+        for(let i = 0; i < values.length; i++) {
+            if(values[i].kind === "file") {
+                let n = values[i].name.split('.').pop();
+                if(extList[n] !== undefined)
+                    extList[n].count += 1;
+                else
+                    extList[n] = { count: 1 };
+            }
+        }
+    });
+    return extList;
+}
+
+export { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList, CountFileType };
