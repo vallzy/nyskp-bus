@@ -2,8 +2,9 @@ import { Button, Card, Tree, Typography, Divider, Space } from 'antd';
 import React, { useState } from 'react';
 import { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList } from '../lib/Access';
 import Dragdrop from './Dragdrop';
+import Settings from './Settings';
 import "../tester.css"
-import { get } from 'idb-keyval';
+import { set, get } from 'idb-keyval';
 import { text, bus_sort } from '../lib/BustoolsHandler';
 import { getNewBusFileHandle } from '../lib/fs-helper';
 
@@ -69,20 +70,7 @@ function GetAccess() {
         >
           <Dragdrop {...props}></Dragdrop>
           <Divider />
-          {data.length <= 0 &&
-            <Title level={5} type='danger'>
-              Currently there are no directories with access.
-            </Title>
-          }
-          <DirectoryTree
-            multiple
-            onExpand={onExpand}
-            onSelect={onSelect}
-            treeData={data}
-            selectable={true}
-            height={300}
-            style={{marginBottom:'1rem'}}
-          />
+          <Settings {...[data]}/>
         </Card>
       </Space>
     </>
