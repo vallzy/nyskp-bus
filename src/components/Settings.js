@@ -21,12 +21,12 @@ const steps = [
     }
 ];
 
-const options = 
+const options =
 {
     'text': {
-        files: [['.bus', 1]]
+        files: [['.bus', 15]]
     },
-    'sort': {
+    'sorted': {
         files: [['.bus', 2]]
     },
     'count': {
@@ -44,15 +44,20 @@ async function CheckIfSufficientFiletypes(opt) {
     let flag = false;
     let access = await CountFileType();
     let option_files = options[opt].files;
-    for(let i = 0; i < option_files.length; i++) {
+    let ext_log = [];
+    for (let i = 0; i < option_files.length; i++) {
         let ext, count;
-        [ext, count] = option_files[i]; 
-        ext = ext.slice(1, ext.length);
-        if(access[ext] === undefined || access[ext].count < count)
+        [ext, count] = option_files[i];
+        ext = ext.slice(1);
+        if (access[ext] === undefined || access[ext].count < count) {
             flag = true;
+            ext_log.push([ext, access[ext] === undefined ? count : count - access[ext].count]);
+        }
     }
-    if(flag) 
-        message.error("Warning: you have not given access to sufficient files to use this option.");
+    if (flag) {
+        message.error(`${opt.charAt(0).toUpperCase() + opt.slice(1)}: did not detect all required files to use this option`);
+    }
+    return ext_log;
 }
 
 const Settings = (props) => {
@@ -61,7 +66,7 @@ const Settings = (props) => {
 
     let shouldBlock = props[0].length <= 0;
     const next = () => {
-        if(current === 1) {
+        if (current === 1) {
             CheckIfSufficientFiletypes(option);
         }
         if (!shouldBlock)
@@ -72,7 +77,7 @@ const Settings = (props) => {
         setOption(opt);
         CheckIfSufficientFiletypes(opt);
     }
-    
+
 
     const prev = () => {
         setCurrent(current - 1);
@@ -80,7 +85,7 @@ const Settings = (props) => {
 
     return (
         <>
-            <Card style={{ width: '100%' }}>
+            <Card style={{ width: '100%' }} bordered={false}>
                 <Steps current={current}>
                     {steps.map((item) => (
                         <Step key={item.title} title={item.title} />

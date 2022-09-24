@@ -14,13 +14,13 @@ async function GetDirectoryAccess() {
 
 function ParentPath(full, dirHandleRoot) {
     let sp = full.split('/');
-    if(sp.length === 1) return dirHandleRoot.name;
+    if (sp.length === 1) return dirHandleRoot.name;
     return sp.slice(0, sp.length - 1).join("/");
 }
 
 function MergeDirectories(output, dirHandleRoot) {
     Object.keys(output).forEach((key) => {
-        if(key !== dirHandleRoot.name) {
+        if (key !== dirHandleRoot.name) {
             let parent = ParentPath(key, dirHandleRoot);
             output[parent].children.push(output[key]);
         }
@@ -30,16 +30,16 @@ function MergeDirectories(output, dirHandleRoot) {
 
 async function GenerateDirectoryList(files, dirHandleRoot) {
     let dir = {};
-    dir[dirHandleRoot.name] = { title: dirHandleRoot.name, key: dirHandleRoot.name, children: []};
+    dir[dirHandleRoot.name] = { title: dirHandleRoot.name, key: dirHandleRoot.name, children: [] };
     Object.keys(files).forEach((key) => {
         let item = files[key];
-        if(item.type === "directory") {
+        if (item.type === "directory") {
             dir[key] = { title: item.name, key: item.path, children: [] }
         }
     });
     Object.keys(files).forEach((key) => {
         let item = files[key];
-        if(item.type === "file") {
+        if (item.type === "file") {
             let parent = ParentPath(item.path, dirHandleRoot);
             let entry = { title: item.name, key: item.path, isLeaf: true }
             dir[parent] ? dir[parent].children.push(entry) : dir[dirHandleRoot.name].children.push(entry);
@@ -77,10 +77,10 @@ async function HandleDirectoryEntry(dirHandle, out, rootCopy, pathList) {
 async function CountFileType() {
     let extList = {};
     await values().then(async (values) => {
-        for(let i = 0; i < values.length; i++) {
-            if(values[i].kind === "file") {
+        for (let i = 0; i < values.length; i++) {
+            if (values[i].kind === "file") {
                 let n = values[i].name.split('.').pop();
-                if(extList[n] !== undefined)
+                if (extList[n] !== undefined)
                     extList[n].count += 1;
                 else
                     extList[n] = { count: 1 };
