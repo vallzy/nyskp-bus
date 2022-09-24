@@ -1,7 +1,8 @@
-import { Button, message, Steps, Card, Tree, Typography, Collapse, Radio, Space } from 'antd';
+import { Button, message, Steps, Card, Tree, Typography, Input, Radio, Space } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import { CountFileType } from '../lib/Access';
+import Pairing from './Pairing';
 import { clear } from 'idb-keyval';
 const { Step } = Steps;
 const { Text } = Typography;
@@ -14,13 +15,14 @@ const steps = [
         title: 'Options'
     },
     {
-        title: 'Pair Files'
+        title: 'Selection'
     },
     {
-        title: 'Finalize'
+        title: 'Pair & Finalize'
     }
 ];
 
+//To-do: rework?
 const options =
 {
     'text': {
@@ -83,6 +85,10 @@ const Settings = (props) => {
         setCurrent(current - 1);
     };
 
+    const onDrop = (info) => {
+        console.log(info);
+    }
+
     return (
         <>
             <Card style={{ width: '100%' }} bordered={false}>
@@ -100,13 +106,16 @@ const Settings = (props) => {
                                     : <Text type="success"><CheckOutlined /> Access given</Text>
                                 }
                                 {!shouldBlock && (
+                                <>
                                     <DirectoryTree
                                         multiple
+                                        draggable
+                                        onDrop={onDrop}
                                         treeData={props[0]}
-                                        selectable={true}
                                         height={300}
                                         style={{ marginBottom: '1rem', marginTop: '1rem' }}
                                     />
+                                </>
                                 )}
                             </>
                         )}
@@ -121,6 +130,9 @@ const Settings = (props) => {
                                     </Radio.Group>
                                 </Space>
                             </>
+                        )}
+                        {current === 2 && (
+                            <Pairing {...[props[0]]}/>
                         )}
                     </Card>
                 </div>
