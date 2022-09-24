@@ -1,21 +1,17 @@
-import { Button, Card, Tree, Typography, Divider, Space } from 'antd';
+import { Card, Divider, Space } from 'antd';
 import React, { useState } from 'react';
 import { GetDirectoryAccess, HandleDirectoryEntry, GenerateDirectoryList } from '../lib/Access';
 import Dragdrop from './Dragdrop';
 import Settings from './Settings';
 import "../tester.css"
-import { set, get } from 'idb-keyval';
+import { get } from 'idb-keyval';
 import { text, bus_sort } from '../lib/BustoolsHandler';
-import { getNewBusFileHandle } from '../lib/fs-helper';
-
-const { DirectoryTree } = Tree;
-const { Title } = Typography;
 
 let masterTree = [];
 
 function GetAccess() {
   const [data, setData] = useState([]);
-  
+
   const startAccess = async () => {
     let rawTree = await GetDirectoryAccess();
     masterTree = [...masterTree, rawTree];
@@ -31,10 +27,10 @@ function GetAccess() {
 
       for await (const handle of fileHandlesPromises) {
         if (handle.kind === 'directory') {
-          const out = {name: handle.name}; 
+          const out = { name: handle.name };
           let pathList = {};
           let bkupHandle = handle;
-          await HandleDirectoryEntry( handle, out, bkupHandle, pathList);
+          await HandleDirectoryEntry(handle, out, bkupHandle, pathList);
           let rawTree = await GenerateDirectoryList(pathList, bkupHandle);
           masterTree = [...masterTree, rawTree];
           setData(masterTree);
@@ -49,10 +45,10 @@ function GetAccess() {
     console.log(keys);
     let filehandle = await get(keys[0]);
     console.log('Filehandle acquired', filehandle);
-    if(filehandle.kind === "file") {
+    if (filehandle.kind === "file") {
       let file = await filehandle.getFile();
       await bus_sort(file);
-      }
+    }
   };
 
   const onExpand = async (keys, info) => {
@@ -70,7 +66,7 @@ function GetAccess() {
         >
           <Dragdrop {...props}></Dragdrop>
           <Divider />
-          <Settings {...[data]}/>
+          <Settings {...[data]} />
         </Card>
       </Space>
     </>
