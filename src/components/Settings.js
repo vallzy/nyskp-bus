@@ -15,61 +15,95 @@ const steps = [
         title: 'Options'
     },
     {
-        title: 'Selection'
+        title: 'Pairing'
     },
     {
-        title: 'Pair & Finalize'
+        title: 'Finalize'
     }
 ];
 
-//To-do: rework?
-const options =
+const options = 
 {
     'text': {
-        files: [['.bus', 15]]
+        files: [
+            {
+                key: 'textinputfile',
+                type: '.bus',
+                purpose: 'Input .bus file',
+                required: true
+            }
+        ]
     },
     'sorted': {
-        files: [['.bus', 2]]
+        files: [
+            {
+                key: 'sortedinputfile',
+                type: '.bus',
+                purpose: 'Input .bus file',
+                required: true
+            }
+        ]
     },
     'count': {
-        files: [['.bus', 2], ['.ec', 1], ['.tr2g', 1], ['.txt', 1]]
+        files: [
+            {
+                key: 'countinputfile',
+                type: '.bus',
+                purpose: 'input',
+                required: true
+            },
+            {
+                key: 'countecfile',
+                type: '.ec',
+                purpose: 'input',
+                required: true
+            },
+            {
+                key: 'counttxtfile',
+                type: '.txt',
+                purpose: 'input',
+                required: true
+            }
+        ]
     },
-    'inspect': {
-        files: [['.bus', 1]]
-    }
 }
-
 
 const { DirectoryTree } = Tree;
 
 async function CheckIfSufficientFiletypes(opt) {
     let flag = false;
-    let access = await CountFileType();
-    let option_files = options[opt].files;
     let ext_log = [];
-    for (let i = 0; i < option_files.length; i++) {
-        let ext, count;
-        [ext, count] = option_files[i];
-        ext = ext.slice(1);
-        if (access[ext] === undefined || access[ext].count < count) {
+    let ext_record = {};
+    let access = await CountFileType();
+    let opt_f = options[opt].files;
+    for (let i = 0; i < opt_f.length; i++) {
+        let file = opt_f[i];
+        if(!file.required) continue;
+        let exttype = file.type.slice(1);
+        ext_record[exttype] ? ext_record[exttype].count += 1 : ext_record[exttype] = {count : 1};
+    }
+
+    const keys = Object.keys(ext_record);
+    for(let i = 0; i < keys.length; i++) {
+        let key = keys[i];
+        if(access[key] === undefined || access[key].count < ext_record[key].count) {
             flag = true;
-            ext_log.push([ext, access[ext] === undefined ? count : count - access[ext].count]);
+            ext_log.push([key, access[key] === undefined ? ext_record[key].count : ext_record[key].count - access[key].count]);
         }
     }
-    if (flag) {
-        message.error(`${opt.charAt(0).toUpperCase() + opt.slice(1)}: did not detect all required files to use this option`);
-    }
-    return ext_log;
+    return [flag, ext_log]
 }
 
 const Settings = (props) => {
     const [current, setCurrent] = useState(0);
     const [option, setOption] = useState('text');
-
     let shouldBlock = props[0].length <= 0;
-    const next = () => {
+    const next = async () => {
         if (current === 1) {
-            CheckIfSufficientFiletypes(option);
+            const log = await CheckIfSufficientFiletypes(option);
+            if(log[0]) {
+                return message.error("Could not detect sufficient file types with access for this option.")
+            }
         }
         if (!shouldBlock)
             setCurrent(current + 1);
@@ -109,7 +143,6 @@ const Settings = (props) => {
                                 <>
                                     <DirectoryTree
                                         multiple
-                                        draggable
                                         onDrop={onDrop}
                                         treeData={props[0]}
                                         height={300}
@@ -132,7 +165,7 @@ const Settings = (props) => {
                             </>
                         )}
                         {current === 2 && (
-                            <Pairing {...[props[0]]}/>
+                            <Pairing {...[props[0], options[option]]}/>
                         )}
                     </Card>
                 </div>
