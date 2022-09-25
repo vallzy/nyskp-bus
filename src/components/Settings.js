@@ -3,6 +3,7 @@ import { CheckOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import { CountFileType } from '../lib/Access';
 import Pairing from './Pairing';
+import Finalize from './Finalize';
 import { clear } from 'idb-keyval';
 const { Step } = Steps;
 const { Text } = Typography;
@@ -29,7 +30,7 @@ const options =
             {
                 key: 'textinputfile',
                 type: '.bus',
-                purpose: 'Input .bus file',
+                purpose: 'Input .bus',
                 required: true
             }
         ]
@@ -39,7 +40,7 @@ const options =
             {
                 key: 'sortedinputfile',
                 type: '.bus',
-                purpose: 'Input .bus file',
+                purpose: 'Input .bus',
                 required: true
             }
         ]
@@ -49,19 +50,19 @@ const options =
             {
                 key: 'countinputfile',
                 type: '.bus',
-                purpose: 'input',
+                purpose: 'Input BUS',
                 required: true
             },
             {
                 key: 'countecfile',
                 type: '.ec',
-                purpose: 'input',
+                purpose: 'Input EC',
                 required: true
             },
             {
                 key: 'counttxtfile',
                 type: '.txt',
-                purpose: 'input',
+                purpose: 'Input Transcript',
                 required: true
             }
         ]
@@ -97,12 +98,21 @@ async function CheckIfSufficientFiletypes(opt) {
 const Settings = (props) => {
     const [current, setCurrent] = useState(0);
     const [option, setOption] = useState('text');
+    const [fileState, setFileState] = useState([]);
+
     let shouldBlock = props[0].length <= 0;
     const next = async () => {
         if (current === 1) {
             const log = await CheckIfSufficientFiletypes(option);
             if(log[0]) {
                 return message.error("Could not detect sufficient file types with access for this option.")
+            }
+        }
+        if (current === 2) {
+            if(fileState.length <= 0) return message.error("All files must be paired.");
+            for(let i = 0; i < fileState.length; i++) {
+                if(fileState[i].path === undefined)
+                    return message.error("All files must be paired.");
             }
         }
         if (!shouldBlock)
@@ -121,6 +131,11 @@ const Settings = (props) => {
 
     const onDrop = (info) => {
         console.log(info);
+    }
+
+    const handleFileState = (state) => {
+        setFileState(state);
+        console.log('settings filestate', fileState);
     }
 
     return (
@@ -165,7 +180,10 @@ const Settings = (props) => {
                             </>
                         )}
                         {current === 2 && (
-                            <Pairing {...[props[0], options[option]]}/>
+                            <Pairing {...[props[0], options[option], handleFileState]}/>
+                        )}
+                        {current === 3 && (
+                            <Finalize />
                         )}
                     </Card>
                 </div>
