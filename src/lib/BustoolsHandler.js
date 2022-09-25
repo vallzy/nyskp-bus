@@ -30,11 +30,16 @@ async function bus_text(inputFile) {
 }
  
 async function bus_sort(busFile) {
+  try {
   let out = await getNewBusFileHandle();
   let CLI = await getCLI();
   await CLI.mount([busFile]);
   const y = await CLI.exec(`bustools sort -T /shared/data/temp -m 1G -p /shared/data/${busFile.name}`);
   await writeFile(out, y);
+  } catch (err) {
+    return false;
+  }
+  return true;
 }
 
 

@@ -1,10 +1,10 @@
-import { Button, message, Steps, Card, Tree, Typography, Input, Radio, Space } from 'antd';
+import { Button, message, Steps, Card, Tree, Typography, Radio, Space } from 'antd';
 import { CheckOutlined } from '@ant-design/icons';
 import React, { useState } from 'react';
 import { CountFileType } from '../lib/Access';
 import Pairing from './Pairing';
 import Finalize from './Finalize';
-import { clear } from 'idb-keyval';
+import { bus_sort, bus_text } from '../lib/BustoolsHandler';
 const { Step } = Steps;
 const { Text } = Typography;
 
@@ -33,7 +33,8 @@ const options =
                 purpose: 'Input .bus',
                 required: true
             }
-        ]
+        ],
+        func: bus_text
     },
     'sorted': {
         files: [
@@ -43,7 +44,8 @@ const options =
                 purpose: 'Input .bus',
                 required: true
             }
-        ]
+        ],
+        func: bus_sort
     },
     'count': {
         files: [
@@ -135,7 +137,6 @@ const Settings = (props) => {
 
     const handleFileState = (state) => {
         setFileState(state);
-        console.log('settings filestate', fileState);
     }
 
     return (
@@ -183,7 +184,7 @@ const Settings = (props) => {
                             <Pairing {...[props[0], options[option], handleFileState]}/>
                         )}
                         {current === 3 && (
-                            <Finalize />
+                            <Finalize {...[fileState, options[option]]}/>
                         )}
                     </Card>
                 </div>
@@ -191,11 +192,6 @@ const Settings = (props) => {
                     {current < steps.length - 1 && (
                         <Button disabled={shouldBlock} type="primary" onClick={() => next()}>
                             Next
-                        </Button>
-                    )}
-                    {current === steps.length - 1 && (
-                        <Button type="primary" onClick={() => message.success('Processing complete!')}>
-                            Done
                         </Button>
                     )}
                     {current > 0 && (

@@ -1,6 +1,6 @@
 import { TreeSelect, Card, Typography, Steps } from 'antd';
 import React, { useState } from 'react';
-const { Text, Title } = Typography;
+const { Title } = Typography;
 const { Step } = Steps;
 
 let steps = [];
@@ -20,19 +20,16 @@ function InitFileState(option) {
 }
 
 const Pairing = (props) => {
-  const [value, setValue] = useState();
   const [fileState, setFileState] = useState(InitFileState(props[1]));
   const [current, setCurrent] = useState(0);
  
   const onChange = (value) => {
-    console.log('onChange:', current);
     setCurrent(value);
   };
 
   const option = props[1];
   const fileStateHandler = props[2];
 
-  console.log('filestate', fileState);
   steps = InitSteps(option);
 
   const option_files = option.files;

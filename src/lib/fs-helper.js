@@ -168,4 +168,4 @@
    return false;
  }
 
- export { getNewFileHandle, getNewBusFileHandle, writeFile, getFileHandle, readFile, verifyPermission};
+ export { getNewFileHandle, getNewBusFileHandle, writeFile, getFileHandle, readFile, verifyPermission };
